@@ -9,12 +9,15 @@
       <router-view/>
     </div>
     <div class="my-team">
-      My team: []
+      <team />
     </div>
   </div>
 </template>
 
 <style lang="scss">
+body {
+  margin: 0
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -41,12 +44,28 @@
 }
 
 .my-team {
-  height: 50px;
-  width: 100%;
   position: fixed;
   bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  box-shadow: #2c3e50;
+  border: 1px solid
+}
+
+* > * {
+  box-sizing: border-box;
 }
 </style>
+
+<script>
+import Team from './views/Team'
+export default {
+  components: {
+    Team
+  },
+  created () {
+    this.$store.dispatch('loadResources')
+  }
+}
+</script>

@@ -1,15 +1,26 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-import Team from '@/views/Team.vue'
+import Team from '../views/Team.vue'
+import PokemonDetails from '../components/PokemonDetails.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
+    redirect: '/pokemon'
+  },
+  {
+    path: '/pokemon',
     name: 'Home',
-    component: Home
+    component: Home,
+    children: [
+      {
+        path: ':id',
+        component: PokemonDetails
+      }
+    ]
   },
   {
     path: '/types',
