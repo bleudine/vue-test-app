@@ -1,17 +1,21 @@
 <template>
- <router-link :to="`/pokemon/${pokemon.name}`" class="pokemon-link">
-   <div class="pokemon">
-     <slot name="header"></slot>
-     <img alt="pokemon-sprite" :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`" />
-     <slot name="footer"></slot>
-   </div>
- </router-link>
+  <router-link :to="`/pokemon/${pokemon.name}`" class="pokemon-link">
+    <div class="pokemon">
+      <slot name="header"></slot>
+      <img class="pokemon-sprite" alt="pokemon-sprite"
+           :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`"/>
+      <slot name="footer"></slot>
+    </div>
+  </router-link>
 </template>
 
 <style>
 .pokemon-link {
   display: block;
   text-decoration: none;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .2);
+  border-radius: 4px;
+  background-color: #f0f0f0;
 }
 
 .pokemon {
@@ -27,6 +31,10 @@ img {
   height: auto;
   margin: auto;
   display: block;
+}
+
+.pokemon-sprite {
+
   animation: unblur 500ms;
 }
 

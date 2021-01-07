@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div id="nav">
+    <div id="nav" ref="nav">
       <div class="nav-link-container">
         <router-link to="/pokemon">Home</router-link>
         |
@@ -88,6 +88,7 @@ body {
   height: 100vh;
   overflow-y: scroll;
   background-color: #ffcb55;
+  position: relative;
 }
 
 .my-team {

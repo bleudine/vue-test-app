@@ -30,7 +30,12 @@ export default new Vuex.Store({
   },
   mutations: {
     addToTeam (state, pokemon) {
-      state.team.push(pokemon)
+      if (state.team.length < 6) {
+        state.team.push(pokemon)
+      }
+    },
+    removeFromTeam (state, index) {
+      state.team.splice(index, 1)
     },
     setResources (state, data) {
       const { pokemons, types } = data
@@ -54,10 +59,11 @@ export default new Vuex.Store({
     addToTeam ({ commit }, { pokemon }) {
       commit('addToTeam', pokemon)
     },
+    removeFromTeam ({ commit }, { index }) {
+      commit('removeFromTeam', index)
+    },
     setSelectedType ({ commit }, { type }) {
       commit('setSelectedTypes', type)
     }
-  },
-  modules: {
   }
 })

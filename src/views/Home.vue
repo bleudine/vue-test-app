@@ -1,8 +1,12 @@
 <template>
   <div class="home">
     <div class="team">
-      <div v-for="(pokemon, index) in team" :key="`team-${index}`">
-        <pokemon :pokemon="pokemon"/>
+      <div class="pokemon-team" v-for="(pokemon, index) in team" :key="`team-${index}`">
+        <pokemon :pokemon="pokemon">
+          <template v-slot:header>
+            <button class="remove-button" @click.prevent="removeFromTeam(index)">x</button>
+          </template>
+        </pokemon>
       </div>
     </div>
     <div class="pokemon-list">
@@ -25,11 +29,31 @@
 .team {
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  width: 100%;
   max-width: 100%;
-  overflow-x: scroll;
   position: sticky;
   top: 0;
   background-color: #f0f0f0;
+  box-shadow: 0 2px 2px 0 rgba(44, 62, 80, .2);
+  z-index: 1;
+  padding: 32px;
+
+  .pokemon-team {
+    margin: 12px;
+    border-radius: 4px;
+    background: #f0f0f0;
+    box-shadow: 0 2px 2px 0 rgba(44, 62, 80, .2);
+    position: relative;
+
+    .remove-button {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      border:none;
+      border-radius: 50%;
+    }
+  }
 }
 
 .pokemon-list {
@@ -42,7 +66,6 @@
 
 .pokemon-container {
   margin: 8px;
-  background-color: #f0f0f0;
 }
 
 .pokemon-name {
@@ -69,6 +92,9 @@ export default {
   methods: {
     addToTeam (pokemon) {
       this.$store.dispatch('addToTeam', { pokemon })
+    },
+    removeFromTeam (index) {
+      this.$store.dispatch('removeFromTeam', { index })
     }
   }
 }

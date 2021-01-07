@@ -1,45 +1,51 @@
 <template>
-  <div v-on:scroll.prevent="" class="pokemon-lightbox" v-scroll-lock="true">
+  <div v-on:scroll.prevent="" class="pokemon-lightbox" :style="{left: left}">
     <router-link to="/pokemon" class="lightbox-background"></router-link>
     <div class="lightbox-content">
       <div class="pokemon-details-illustrations">
         <div>
+          <div class="pokemon-details-image-container">
+            <img class="pokemon-sprite" :alt="pokemon.id" :src="`${pokemon.sprites[selectedSprite]}`" />
+          </div>
           <div>
             <button :disabled="selectedSprite === 'front_shiny'" @click="selectedSprite = 'front_shiny'">Shiny</button>
             <button :disabled="selectedSprite === 'front_default'" @click="selectedSprite = 'front_default'">Normal</button>
           </div>
-          <div class="pokemon-details-image-container">
-            <img :alt="pokemon.id" :src="`${pokemon.sprites[selectedSprite]}`" />
-          </div>
         </div>
       </div>
-      <div class="pokemon-details-infos">
+      <div class="pokemon-details-container">
         <h3>{{pokemon.name}}</h3>
-        <hr />
-        <strong>type(s) :</strong>
-        <div v-for="{ type} in pokemon.types" :key="`${pokemon.id}-${type.name}`">
-          <span>{{type.name}}</span>
+       <div class="pokemon-details-infos">
+         <strong>type(s) :</strong>
+        <div class="pokemon-details-type">
+          <div v-for="{ type} in pokemon.types" :key="`${pokemon.id}-${type.name}`">
+            <img alt="type-icon" :src="`/assets/${type.name}.png`" />
+          </div>
         </div>
-        <hr />
-        <strong>abilities :</strong>
-        <div v-for="{ability} in pokemon.abilities" :key="`${pokemon.id}-${ability.name}`">
-          <span>{{ability.name}}</span>
+         <strong>abilities :</strong>
+        <div class="pokemon-details-abilities">
+          <div v-for="{ability} in pokemon.abilities" :key="`${pokemon.id}-${ability.name}`">
+            <span>{{ability.name}}</span>
+          </div>
         </div>
-        <hr />
-        <strong>height : {{pokemon.height}}</strong>
-        <hr />
-        <strong>weight : {{pokemon.weight}}</strong>
-        <hr />
-        <strong>stats :</strong>
-        <div v-for="{stat, base_stat} in pokemon.stats" :key="`${pokemon.id}-${stat.name}`">
-          <span>{{stat.name}} : {{base_stat}}</span>
-        </div>
+         <strong>height : </strong><span>{{pokemon.height}}</span>
+         <strong>weight : </strong><span>{{pokemon.weight}}</span>
+         <strong>stats :</strong>
+         <table>
+           <tbody class="stats-table" v-for="{stat, base_stat} in pokemon.stats" :key="`${pokemon.id}-${stat.name}`">
+           <tr>
+             <td>{{stat.name}}</td>
+             <td>{{base_stat}}</td>
+           </tr>
+           </tbody>
+         </table>
+       </div>
       </div>
     </div>
   </div>
 </template>
 
-<style>
+<style lang="scss">
 
 body {
   margin: 0
@@ -50,7 +56,9 @@ body {
   top: 0;
   right: 0;
   bottom: 0;
-  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .lightbox-background {
@@ -62,16 +70,33 @@ body {
 
 .lightbox-content {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: whitesmoke;
   display: flex;
   flex-direction: row;
+  background-color: #ee1515;
+  text-transform: capitalize;
+  color: #f0f0f0;
+  min-width: 380px;
+  padding: 32px;
+}
+
+.pokemon-details-illustrations {
+  button {
+    background-color: #ee1515;
+    color: #ffcb55;
+    margin: 8px;
+    cursor: pointer;
+
+    &:disabled {
+      color: #f0f0f0;
+      cursor: initial;
+    }
+  }
 }
 
 .pokemon-details-image-container {
-  width: 380px;
+  width: 320px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
   border: 1px solid rgba(0, 0, 0, .2)
 }
 
@@ -81,6 +106,49 @@ img {
   margin: auto;
   display: block;
 }
+
+h3 {
+  color: #ffcb55;
+}
+
+.pokemon-details-infos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: center;
+  justify-content: start;
+  background-color:#ffcb55;
+  grid-gap: 2px;
+  padding: 2px;
+  margin-left: 32px;
+
+  strong {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffcb55;
+  }
+
+  *, * > * {
+    background-color: #ee1515;
+  }
+
+  .pokemon-details-type {
+    display: flex;
+    div {
+      margin: 4px;
+    }
+  }
+}
+
+table {
+  border-collapse: collapse;
+  text-align: start;
+
+  td:last-child {
+    text-align: end;
+  }
+}
 </style>
 
 <script>
@@ -88,8 +156,12 @@ export default {
   name: 'PokemonDetails',
   data () {
     return {
-      selectedSprite: 'front_default'
+      selectedSprite: 'front_default',
+      left: 0
     }
+  },
+  mounted () {
+    this.left = `${this.$parent.$parent.$refs.nav.offsetWidth}px`
   },
   methods: {
     getPokemon () {
