@@ -1,15 +1,22 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/team">My team</router-link> |
-      <router-link to="/types">Types: normal</router-link>
+      <div class="nav-link-container">
+        <router-link to="/pokemon">Home</router-link>
+        |
+        <router-link to="/team">My team</router-link>
+      </div>
+      <div class="type-filter-list">
+        <div v-for="(type, index) in types" :key="`type-${index}`">
+          <div @click="addFilter(type)" :class="`type-filter ${isSelected(type) ? '--selected' : ''}`">
+            <img alt="type-icon" :src="`/assets/${type === 'fairy' ? 'unknown' : type}.png`" />
+          </div>
+        </div>
+
+      </div>
     </div>
     <div class="wrapper">
       <router-view/>
-    </div>
-    <div class="my-team">
-      <team />
     </div>
   </div>
 </template>
@@ -18,29 +25,69 @@
 body {
   margin: 0
 }
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  display: flex;
+  flex-direction: row;
 }
 
 #nav {
   padding: 30px;
+  background-color: #003a70;
+  min-width: 20vw;
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+  .nav-link-container {
 
-    &.router-link-exact-active {
-      color: #42b983;
+    a {
+      font-weight: bold;
+      color: #3d7dca;
+
+      &.router-link-exact-active {
+        color: #f0f0f0;
+        text-decoration: none;
+      }
+    }
+  }
+
+  .type-filter-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: 18em;
+    margin: 32px 0;
+
+    .type-filter {
+      margin: 2px;
+      width: 48px;
+      padding: 1px;
+      cursor: pointer;
+
+      img {
+        display: block;
+        width: 100%;
+        margin: auto;
+        filter: opacity(.5);
+      }
+
+      &.--selected {
+        img {
+          filter: none;
+        }
+      }
     }
   }
 }
 
 .wrapper {
-  margin-bottom: 50px;
+  flex-grow: 1;
+  height: 100vh;
+  overflow-y: scroll;
+  background-color: #ffcb55;
 }
 
 .my-team {
@@ -59,13 +106,26 @@ body {
 </style>
 
 <script>
-import Team from './views/Team'
+
 export default {
-  components: {
-    Team
-  },
   created () {
     this.$store.dispatch('loadResources')
+  },
+  methods: {
+    addFilter (type) {
+      this.$store.dispatch('setSelectedType', { type })
+    },
+    isSelected (type) {
+      return this.selectedTypes.includes(type)
+    }
+  },
+  computed: {
+    types () {
+      return this.$store.getters.getTypes
+    },
+    selectedTypes () {
+      return this.$store.getters.getSelectedTypes
+    }
   }
 }
 </script>

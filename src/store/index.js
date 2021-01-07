@@ -8,7 +8,8 @@ export default new Vuex.Store({
   state: {
     pokemons: [],
     team: [],
-    types: []
+    types: [],
+    selectedTypes: []
   },
   getters: {
     getTeam: (state) => {
@@ -19,6 +20,12 @@ export default new Vuex.Store({
     },
     getPokemonList: (state) => {
       return Object.values(state.pokemons)
+    },
+    getTypes: (state) => {
+      return state.types
+    },
+    getSelectedTypes: (state) => {
+      return state.selectedTypes
     }
   },
   mutations: {
@@ -28,7 +35,16 @@ export default new Vuex.Store({
     setResources (state, data) {
       const { pokemons, types } = data
       state.pokemons = pokemons
-      state.types = types
+      state.types = Array.from(types)
+      state.selectedTypes = Array.from(types)
+    },
+    setSelectedTypes (state, type) {
+      const isSelected = state.selectedTypes.includes(type)
+      if (!isSelected) {
+        state.selectedTypes.push(type)
+      } else {
+        state.selectedTypes.splice(state.selectedTypes.indexOf(type), 1)
+      }
     }
   },
   actions: {
@@ -37,6 +53,9 @@ export default new Vuex.Store({
     },
     addToTeam ({ commit }, { pokemon }) {
       commit('addToTeam', pokemon)
+    },
+    setSelectedType ({ commit }, { type }) {
+      commit('setSelectedTypes', type)
     }
   },
   modules: {

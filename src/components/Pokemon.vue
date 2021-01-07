@@ -2,7 +2,7 @@
  <router-link :to="`/pokemon/${pokemon.name}`" class="pokemon-link">
    <div class="pokemon">
      <slot name="header"></slot>
-     <img :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`" />
+     <img alt="pokemon-sprite" :src="`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`" />
      <slot name="footer"></slot>
    </div>
  </router-link>
@@ -11,17 +11,15 @@
 <style>
 .pokemon-link {
   display: block;
+  text-decoration: none;
 }
 
 .pokemon {
   display: flex;
   flex-direction: column;
-  border: 1px solid red;
   width: 100%;
-}
-
-.pokemon-name {
-  text-transform: capitalize;
+  min-width: 96px;
+  padding: 8px;
 }
 
 img {
@@ -48,7 +46,7 @@ export default {
   name: 'Pokemon',
   props: {
     pokemon: Object
-  },
+  }
 
 }
 </script>
