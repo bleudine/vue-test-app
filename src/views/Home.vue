@@ -1,8 +1,8 @@
 <template>
   <div class="home">
-    <div class="team">
+    <div class="team" v-if="team.length > 0">
       <div class="pokemon-team" v-for="(pokemon, index) in team" :key="`team-${index}`">
-        <pokemon :pokemon="pokemon">
+        <pokemon :pokemon="pokemon" :sprite="pokemon.sprites['front_default']">
           <template v-slot:header>
             <button class="remove-button" @click.prevent="removeFromTeam(index)">x</button>
           </template>
@@ -11,7 +11,7 @@
     </div>
     <div class="pokemon-list">
       <div class="pokemon-container" v-for="poke in pokemons" :key="poke.id">
-        <pokemon :pokemon="poke">
+        <pokemon :pokemon="poke" :sprite="poke.sprites['front_default']">
           <template v-slot:header>
             <span class="pokemon-name">{{ poke.name }}</span>
           </template>
@@ -34,10 +34,10 @@
   max-width: 100%;
   position: sticky;
   top: 0;
-  background-color: #f0f0f0;
+  background-color:#ee1515;
   box-shadow: 0 2px 2px 0 rgba(44, 62, 80, .2);
-  z-index: 1;
-  padding: 32px;
+  z-index: 11;
+  padding: 8px;
 
   .pokemon-team {
     margin: 12px;
