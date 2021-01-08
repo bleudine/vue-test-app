@@ -1,6 +1,6 @@
 <template>
   <div v-on:scroll.prevent="" class="pokemon-lightbox" :style="{left: left}">
-    <router-link to="/pokemon" class="lightbox-background"></router-link>
+    <div @click="closeLightbox" class="lightbox-background"></div>
     <div class="lightbox-content">
      <pokemon-details :id="id" />
     </div>
@@ -56,7 +56,12 @@ export default {
   },
   computed: {
     id () {
-      return this.$route.params.id
+      return this.$route.query.pokemon
+    }
+  },
+  methods: {
+    closeLightbox () {
+      this.$emit('close-lightbox')
     }
   }
 }

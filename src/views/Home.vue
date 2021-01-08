@@ -4,7 +4,7 @@
       <div class="pokemon-team" v-for="(pokemon, index) in team" :key="`team-${index}`">
         <pokemon :pokemon="pokemon" :sprite="pokemon.sprites['front_default']">
           <template v-slot:header>
-            <button class="remove-button" @click.prevent="removeFromTeam(index)">x</button>
+            <button class="remove-button" @click.stop="removeFromTeam(index)">x</button>
           </template>
         </pokemon>
       </div>
@@ -16,12 +16,12 @@
             <span class="pokemon-name">{{ poke.name }}</span>
           </template>
           <template v-slot:footer>
-            <button @click.prevent="addToTeam(poke)">Add to team</button>
+            <button @click.stop="addToTeam(poke)">Add to team</button>
           </template>
         </pokemon>
       </div>
     </div>
-    <router-view></router-view>
+    <pokemon-lightbox v-if="showLightbox" @close-lightbox="closeLightbox" />
   </div>
 </template>
 
@@ -75,18 +75,42 @@
 
 <script>
 import Pokemon from '../components/Pokemon.vue'
+import PokemonLightbox from '@/components/PokemonLightbox'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Home',
   components: {
-    Pokemon
+    Pokemon,
+    PokemonLightbox
+  },
+  data () {
+    return {
+      showLightbox: false
+    }
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      vm.showLightbox = Boolean(to.query.pokemon)
+    })
+  },
+  watch: {
+    '$route.query.pokemon': {
+      handler: function (val) {
+        console.log(val)
+        this.showLightbox = Boolean(val)
+      },
+      deep: true
+    }
   },
   computed: {
+    ...mapGetters({
+      getPokemonList: 'getPokemonList',
+      getSelectedTypes: 'getSelectedTypes',
+      team: 'getTeam'
+    }),
     pokemons () {
-      return this.$store.getters.getPokemonList.filter(({ types }) => types.some(({ type: { name } }) => this.$store.getters.getSelectedTypes.includes(name)))
-    },
-    team () {
-      return this.$store.getters.getTeam
+      return this.getPokemonList.filter(({ types }) => types.some(({ type: { name } }) => this.getSelectedTypes.includes(name)))
     }
   },
   methods: {
@@ -95,6 +119,9 @@ export default {
     },
     removeFromTeam (index) {
       this.$store.dispatch('removeFromTeam', { index })
+    },
+    closeLightbox () {
+      this.$router.push({ name: 'Home', query: null })
     }
   }
 }

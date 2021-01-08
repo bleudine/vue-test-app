@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="`/pokemon/${pokemon.name}`" class="pokemon-link">
+  <div @click="navigate(pokemon.name)" class="pokemon-link">
     <div class="pokemon-gradient" :style="cssVars"/>
     <div class="pokemon">
       <slot name="header"></slot>
@@ -7,7 +7,7 @@
            :src="sprite"/>
       <slot name="footer"></slot>
     </div>
-  </router-link>
+  </div>
 </template>
 
 <style lang="scss" scoped="">
@@ -91,8 +91,12 @@ export default {
         '--second': colors[first.type.name]
       }
     }
+  },
+  methods: {
+    navigate (name) {
+      this.$router.replace({ name: 'Home', query: { pokemon: name } })
+    }
   }
-
 }
 </script>
 

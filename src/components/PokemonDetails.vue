@@ -2,11 +2,11 @@
   <div class="container">
     <div class="pokemon-details-illustrations">
       <div>
-        <pokemon :sprite="pokemon.sprites[selectedSprite]" :pokemon="pokemon" />
+        <pokemon :sprite="pokemon.sprites[selectedSprite]" :pokemon="pokemon"/>
         <div class="pokemon-details-image-switch">
-          <button :disabled="selectedSprite === 'front_shiny'" @click="selectedSprite = 'front_shiny'">Shiny</button>
           <button :disabled="selectedSprite === 'front_default'" @click="selectedSprite = 'front_default'">Normal
           </button>
+          <button :disabled="selectedSprite === 'front_shiny'" @click="selectedSprite = 'front_shiny'">Shiny</button>
         </div>
       </div>
     </div>
@@ -139,6 +139,8 @@ table {
 
 <script>
 import Pokemon from '@/components/Pokemon'
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'PokemonDetails',
   components: {
@@ -153,8 +155,11 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      getPokemon: 'getPokemon'
+    }),
     pokemon () {
-      return this.$store.getters.getPokemon(this.id)
+      return this.getPokemon(this.id)
     }
   }
 }
