@@ -4,9 +4,9 @@
       <div>
         <pokemon :sprite="pokemon.sprites[selectedSprite]" :pokemon="pokemon"/>
         <div class="pokemon-details-image-switch">
-          <button :disabled="selectedSprite === 'front_default'" @click="selectedSprite = 'front_default'">Normal
-          </button>
-          <button :disabled="selectedSprite === 'front_shiny'" @click="selectedSprite = 'front_shiny'">Shiny</button>
+          <v-btn :disabled="selectedSprite === 'front_default'" @click="selectedSprite = 'front_default'">Normal
+          </v-btn>
+          <v-btn :disabled="selectedSprite === 'front_shiny'" @click="selectedSprite = 'front_shiny'">Shiny</v-btn>
         </div>
       </div>
     </div>
@@ -40,6 +40,34 @@
     </div>
   </div>
 </template>
+
+<script>
+import Pokemon from '@/components/Pokemon'
+import { mapGetters } from 'vuex'
+
+export default {
+  name: 'PokemonDetails',
+  components: {
+    Pokemon
+  },
+  props: {
+    id: String
+  },
+  data () {
+    return {
+      selectedSprite: 'front_default'
+    }
+  },
+  computed: {
+    ...mapGetters({
+      getPokemon: 'getPokemon'
+    }),
+    pokemon () {
+      return this.getPokemon(this.id)
+    }
+  }
+}
+</script>
 
 <style lang="scss">
 .container {
@@ -136,31 +164,3 @@ table {
   }
 }
 </style>
-
-<script>
-import Pokemon from '@/components/Pokemon'
-import { mapGetters } from 'vuex'
-
-export default {
-  name: 'PokemonDetails',
-  components: {
-    Pokemon
-  },
-  props: {
-    id: String
-  },
-  data () {
-    return {
-      selectedSprite: 'front_default'
-    }
-  },
-  computed: {
-    ...mapGetters({
-      getPokemon: 'getPokemon'
-    }),
-    pokemon () {
-      return this.getPokemon(this.id)
-    }
-  }
-}
-</script>

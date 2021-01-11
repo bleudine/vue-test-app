@@ -9,7 +9,8 @@ export default new Vuex.Store({
     pokemons: [],
     team: [],
     types: [],
-    selectedTypes: []
+    selectedTypes: [],
+    savedTeams: {}
   },
   getters: {
     getTeam: (state) => {
@@ -26,19 +27,33 @@ export default new Vuex.Store({
     },
     getSelectedTypes: (state) => {
       return state.selectedTypes
+    },
+    getSavedTeams: (state) => {
+      return state.savedTeams
     }
   },
   mutations: {
     addToTeam (state, pokemon) {
-      if (state.team.length < 6) {
-        state.team.push(pokemon)
+      state.team.push(pokemon)
+      if (state.team.length > 6) {
+        state.team.shift()
       }
     },
     removeFromTeam (state, index) {
       state.team.splice(index, 1)
     },
+    saveTeam (state, title) {
+      state.savedTeams = {
+        ...state.savedTeams,
+        [title]: state.team
+      }
+    },
+    loadTeam (state, title) {
+      state.team = state.savedTeams[title]
+    },
     setResources (state, data) {
-      const { pokemons, types } = data
+      const { pokemons, types, savedTeams } = data
+      state.savedTeams = savedTeams
       state.pokemons = pokemons
       state.types = Array.from(types)
       state.selectedTypes = Array.from(types)
@@ -53,14 +68,24 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    loadResources ({ commit }) {
-      commit('setResources', resources)
+    async loadResources ({ commit }) {
+      const storedTeams = localStorage.getItem('savedTeams')
+      commit('setResources', { ...resources, savedTeams: JSON.parse(storedTeams) })
     },
     addToTeam ({ commit }, { pokemon }) {
       commit('addToTeam', pokemon)
     },
     removeFromTeam ({ commit }, { index }) {
       commit('removeFromTeam', index)
+    },
+    loadTeam ({ commit }, { name }) {
+      commit('loadTeam', name)
+    },
+    saveTeam ({ commit, state }, { title }) {
+      const storedTeams = localStorage.getItem('savedTeams')
+      const savedTeams = JSON.parse(storedTeams)
+      localStorage.setItem('savedTeams', JSON.stringify({ ...savedTeams, [title]: state.team }))
+      commit('saveTeam', title)
     },
     setSelectedType ({ commit }, { type }) {
       commit('setSelectedTypes', type)

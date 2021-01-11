@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" data-app>
     <div id="nav" ref="nav">
       <div class="nav-link-container">
         <router-link to="/pokemon">Home</router-link>
@@ -9,10 +9,16 @@
       <div class="type-filter-list">
         <div v-for="(type, index) in types" :key="`type-${index}`">
           <div @click="addFilter(type)" :class="`type-filter ${isSelected(type) ? '--selected' : ''}`">
-            <img alt="type-icon" :src="`/assets/${type === 'fairy' ? 'unknown' : type}.png`" />
+            <img alt="type-icon" :src="`/assets/${type === 'fairy' ? 'unknown' : type}.png`"/>
           </div>
         </div>
-
+      </div>
+      <div class="saved-teams">
+        <ul>
+          <li v-for="name in savedTeamNames" :key="name">
+            <v-btn @click="loadTeam(name)">{{name}}</v-btn>
+          </li>
+        </ul>
       </div>
     </div>
     <div class="wrapper">
@@ -20,6 +26,58 @@
     </div>
   </div>
 </template>
+
+<script>
+import { mapGetters } from 'vuex'
+
+// TODO use all buttons and inputs with vuetify
+
+// TODO OPTIONAL : think of a way to filter with types without using vuex store (maybe pass nav in Home component)
+
+// teams
+// TODO save a team and load a team
+
+// TODO Home search bar to filter list with combo box by vuetify and match ALL tags
+// TODO search pokemon name and pokemon type
+
+// TODO use translation (french version alongside engrish version) with vue-i18n
+
+// TODO add new routes with pokemon table type (see https://www.pokebip.com/page/jeuxvideo/table-des-types)
+// TODO to achieve this use data table
+
+// TODO use API instead of local resources ffs
+
+// single view pokemon
+// TODO display weakness table
+// TODO display pokemon evolutions
+
+export default {
+  created () {
+    this.$store.dispatch('loadResources')
+  },
+  methods: {
+    addFilter (type) {
+      this.$store.dispatch('setSelectedType', { type })
+    },
+    isSelected (type) {
+      return this.selectedTypes.includes(type)
+    },
+    loadTeam (name) {
+      this.$store.dispatch('loadTeam', { name })
+    }
+  },
+  computed: {
+    ...mapGetters({
+      types: 'getTypes',
+      selectedTypes: 'getSelectedTypes',
+      savedTeams: 'getSavedTeams'
+    }),
+    savedTeamNames () {
+      return Object.keys(this.savedTeams)
+    }
+  }
+}
+</script>
 
 <style lang="scss">
 body {
@@ -101,58 +159,16 @@ body {
   border: 1px solid
 }
 
+.saved-teams {
+  color: #fefefe;
+
+  ul {
+
+    list-style-type: none;
+  }
+}
+
 * > * {
   box-sizing: border-box;
 }
 </style>
-
-<script>
-import { mapGetters } from 'vuex'
-
-// TODO switch style and scripts tags EVERYWHERE
-// TODO install vuetify
-// TODO rework lightbox with vuetify (remove $parent.$parent shenanigans)
-// TODO use all buttons and inputs with vuetify
-// TODO use mapGetters and/or mapState
-
-// TODO OPTIONAL : think of a way to filter with types without using vuex store (maybe pass nav in Home component)
-
-// teams
-// TODO only 6 pokemon per team
-// TODO remove oldest pokemon if limit is reached
-// TODO save a team and load a team
-
-// TODO Home search bar to filter list with combo box by vuetify and match ALL tags
-// TODO search pokemon name and pokemon type
-
-// TODO use translation (french version alongside engrish version) with vue-i18n
-
-// TODO add new routes with pokemon table type (see https://www.pokebip.com/page/jeuxvideo/table-des-types)
-// TODO to achieve this use data table
-
-// TODO use API instead of local resources ffs
-
-// single view pokemon
-// TODO display weakness table
-// TODO display pokemon evolutions
-
-export default {
-  created () {
-    this.$store.dispatch('loadResources')
-  },
-  methods: {
-    addFilter (type) {
-      this.$store.dispatch('setSelectedType', { type })
-    },
-    isSelected (type) {
-      return this.selectedTypes.includes(type)
-    }
-  },
-  computed: {
-    ...mapGetters({
-      types: 'getTypes',
-      selectedTypes: 'getSelectedTypes'
-    })
-  }
-}
-</script>

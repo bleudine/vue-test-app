@@ -1,10 +1,25 @@
 <template>
   <div class="team-view">
     <div v-for="(pokemon, index) in team" :key="`team-${index}`">
-      <pokemon-details :id="pokemon.name" />
+      <pokemon-details :id="pokemon.name"/>
     </div>
   </div>
 </template>
+
+<script>
+import { mapGetters } from 'vuex'
+import PokemonDetails from '@/components/PokemonDetails'
+
+export default {
+  name: 'Team',
+  components: { PokemonDetails },
+  computed: {
+    ...mapGetters({
+      team: 'getTeam'
+    })
+  }
+}
+</script>
 
 <style lang="scss">
 
@@ -33,17 +48,3 @@
 }
 
 </style>
-
-<script>
-import PokemonDetails from '@/components/PokemonDetails'
-export default {
-  name: 'Team',
-  components: { PokemonDetails },
-  computed: {
-    team () {
-      console.log(this.$store.getters.getTeam)
-      return this.$store.getters.getTeam
-    }
-  }
-}
-</script>

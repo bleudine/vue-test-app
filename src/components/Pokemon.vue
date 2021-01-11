@@ -10,6 +10,38 @@
   </div>
 </template>
 
+<script>
+import colors from '../assets/colors.json'
+export default {
+// TODO add background color to each pokemon in list based on type's color with .5 opacity and BONUS: gradient in case of double type
+  name: 'Pokemon',
+  props: {
+    pokemon: Object,
+    sprite: String
+  },
+  computed: {
+    cssVars () {
+      const [first, second] = this.pokemon.types
+      if (second) {
+        return {
+          '--first': colors[first.type.name],
+          '--second': colors[second.type.name]
+        }
+      }
+      return {
+        '--first': colors[first.type.name],
+        '--second': colors[first.type.name]
+      }
+    }
+  },
+  methods: {
+    navigate (name) {
+      this.$router.replace({ name: 'Home', query: { pokemon: name } })
+    }
+  }
+}
+</script>
+
 <style lang="scss" scoped="">
 .pokemon-link {
   display: block;
@@ -66,40 +98,4 @@ img {
     filter: none;
   }
 }
-</style>
-
-<script>
-import colors from '../assets/colors.json'
-export default {
-// TODO add background color to each pokemon in list based on type's color with .5 opacity and BONUS: gradient in case of double type
-  name: 'Pokemon',
-  props: {
-    pokemon: Object,
-    sprite: String
-  },
-  computed: {
-    cssVars () {
-      const [first, second] = this.pokemon.types
-      if (second) {
-        return {
-          '--first': colors[first.type.name],
-          '--second': colors[second.type.name]
-        }
-      }
-      return {
-        '--first': colors[first.type.name],
-        '--second': colors[first.type.name]
-      }
-    }
-  },
-  methods: {
-    navigate (name) {
-      this.$router.replace({ name: 'Home', query: { pokemon: name } })
-    }
-  }
-}
-</script>
-
-<style scoped lang="scss">
-
 </style>

@@ -4,26 +4,73 @@
       <div class="pokemon-team" v-for="(pokemon, index) in team" :key="`team-${index}`">
         <pokemon :pokemon="pokemon" :sprite="pokemon.sprites['front_default']">
           <template v-slot:header>
-            <button class="remove-button" @click.stop="removeFromTeam(index)">x</button>
+            <v-btn class="remove-button" @click.stop="removeFromTeam(index)">x</v-btn>
           </template>
         </pokemon>
       </div>
+      <v-btn @click="saveTeam">save team</v-btn>
     </div>
     <div class="pokemon-list">
       <div class="pokemon-container" v-for="poke in pokemons" :key="poke.id">
-        <pokemon :pokemon="poke" :sprite="poke.sprites['front_default']">
-          <template v-slot:header>
-            <span class="pokemon-name">{{ poke.name }}</span>
-          </template>
-          <template v-slot:footer>
-            <button @click.stop="addToTeam(poke)">Add to team</button>
-          </template>
-        </pokemon>
+       <pokemon-lightbox :name="poke.name" @close-lightbox="closeLightbox">
+        <template v-slot:activator>
+          <pokemon :pokemon="poke" :sprite="poke.sprites['front_default']">
+            <template v-slot:header>
+              <span class="pokemon-name">{{ poke.name }}</span>
+            </template>
+            <template v-slot:footer>
+              <v-btn @click.stop="addToTeam(poke)">Add to team</v-btn>
+            </template>
+          </pokemon>
+        </template>
+       </pokemon-lightbox>
       </div>
     </div>
-    <pokemon-lightbox v-if="showLightbox" @close-lightbox="closeLightbox" />
   </div>
 </template>
+
+<script>
+import Pokemon from '../components/Pokemon.vue'
+import PokemonLightbox from '@/components/PokemonModal'
+import { mapGetters } from 'vuex'
+
+export default {
+  name: 'Home',
+  components: {
+    Pokemon,
+    PokemonLightbox
+  },
+  data () {
+    return {
+      showLightbox: false
+    }
+  },
+  computed: {
+    ...mapGetters({
+      getPokemonList: 'getPokemonList',
+      getSelectedTypes: 'getSelectedTypes',
+      team: 'getTeam'
+    }),
+    pokemons () {
+      return this.getPokemonList.filter(({ types }) => types.some(({ type: { name } }) => this.getSelectedTypes.includes(name)))
+    }
+  },
+  methods: {
+    addToTeam (pokemon) {
+      this.$store.dispatch('addToTeam', { pokemon })
+    },
+    removeFromTeam (index) {
+      this.$store.dispatch('removeFromTeam', { index })
+    },
+    closeLightbox () {
+      this.$router.push({ name: 'Home', query: null })
+    },
+    saveTeam () {
+      this.$store.dispatch('saveTeam', { title: 'foo' })
+    }
+  }
+}
+</script>
 
 <style lang="scss">
 .team {
@@ -72,57 +119,3 @@
   text-transform: capitalize;
 }
 </style>
-
-<script>
-import Pokemon from '../components/Pokemon.vue'
-import PokemonLightbox from '@/components/PokemonLightbox'
-import { mapGetters } from 'vuex'
-
-export default {
-  name: 'Home',
-  components: {
-    Pokemon,
-    PokemonLightbox
-  },
-  data () {
-    return {
-      showLightbox: false
-    }
-  },
-  beforeRouteEnter (to, from, next) {
-    next(vm => {
-      vm.showLightbox = Boolean(to.query.pokemon)
-    })
-  },
-  watch: {
-    '$route.query.pokemon': {
-      handler: function (val) {
-        console.log(val)
-        this.showLightbox = Boolean(val)
-      },
-      deep: true
-    }
-  },
-  computed: {
-    ...mapGetters({
-      getPokemonList: 'getPokemonList',
-      getSelectedTypes: 'getSelectedTypes',
-      team: 'getTeam'
-    }),
-    pokemons () {
-      return this.getPokemonList.filter(({ types }) => types.some(({ type: { name } }) => this.getSelectedTypes.includes(name)))
-    }
-  },
-  methods: {
-    addToTeam (pokemon) {
-      this.$store.dispatch('addToTeam', { pokemon })
-    },
-    removeFromTeam (index) {
-      this.$store.dispatch('removeFromTeam', { index })
-    },
-    closeLightbox () {
-      this.$router.push({ name: 'Home', query: null })
-    }
-  }
-}
-</script>
