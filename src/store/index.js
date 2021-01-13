@@ -9,7 +9,6 @@ export default new Vuex.Store({
     pokemons: [],
     team: [],
     types: [],
-    selectedTypes: [],
     savedTeams: {}
   },
   getters: {
@@ -24,9 +23,6 @@ export default new Vuex.Store({
     },
     getTypes: (state) => {
       return state.types
-    },
-    getSelectedTypes: (state) => {
-      return state.selectedTypes
     },
     getSavedTeams: (state) => {
       return state.savedTeams
@@ -45,11 +41,11 @@ export default new Vuex.Store({
     saveTeam (state, title) {
       state.savedTeams = {
         ...state.savedTeams,
-        [title]: state.team
+        [title]: state.team.map(({ name }) => name)
       }
     },
-    loadTeam (state, title) {
-      state.team = state.savedTeams[title]
+    loadTeam (state, team) {
+      state.team = team
     },
     setResources (state, data) {
       const { pokemons, types, savedTeams } = data
@@ -57,20 +53,12 @@ export default new Vuex.Store({
       state.pokemons = pokemons
       state.types = Array.from(types)
       state.selectedTypes = Array.from(types)
-    },
-    setSelectedTypes (state, type) {
-      const isSelected = state.selectedTypes.includes(type)
-      if (!isSelected) {
-        state.selectedTypes.push(type)
-      } else {
-        state.selectedTypes.splice(state.selectedTypes.indexOf(type), 1)
-      }
     }
   },
   actions: {
     async loadResources ({ commit }) {
       const storedTeams = localStorage.getItem('savedTeams')
-      commit('setResources', { ...resources, savedTeams: JSON.parse(storedTeams) })
+      commit('setResources', { ...resources, savedTeams: storedTeams ? JSON.parse(storedTeams) : {} })
     },
     addToTeam ({ commit }, { pokemon }) {
       commit('addToTeam', pokemon)
@@ -78,17 +66,15 @@ export default new Vuex.Store({
     removeFromTeam ({ commit }, { index }) {
       commit('removeFromTeam', index)
     },
-    loadTeam ({ commit }, { name }) {
-      commit('loadTeam', name)
+    loadTeam ({ commit, state }, { name }) {
+      const team = state.savedTeams[name].map((pokemonName) => state.pokemons[pokemonName])
+      commit('loadTeam', team)
     },
     saveTeam ({ commit, state }, { title }) {
       const storedTeams = localStorage.getItem('savedTeams')
       const savedTeams = JSON.parse(storedTeams)
-      localStorage.setItem('savedTeams', JSON.stringify({ ...savedTeams, [title]: state.team }))
+      localStorage.setItem('savedTeams', JSON.stringify({ ...savedTeams, [title]: state.team.map(({ name }) => name) }))
       commit('saveTeam', title)
-    },
-    setSelectedType ({ commit }, { type }) {
-      commit('setSelectedTypes', type)
     }
   }
 })

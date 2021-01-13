@@ -4,9 +4,9 @@
       <div>
         <pokemon :sprite="pokemon.sprites[selectedSprite]" :pokemon="pokemon"/>
         <div class="pokemon-details-image-switch">
-          <v-btn :disabled="selectedSprite === 'front_default'" @click="selectedSprite = 'front_default'">Normal
+          <v-btn class="switch-picture" :disabled="selectedSprite === 'front_default'" @click="selectedSprite = 'front_default'">Normal
           </v-btn>
-          <v-btn :disabled="selectedSprite === 'front_shiny'" @click="selectedSprite = 'front_shiny'">Shiny</v-btn>
+          <v-btn class="switch-picture" :disabled="selectedSprite === 'front_shiny'" @click="selectedSprite = 'front_shiny'">Shiny</v-btn>
         </div>
       </div>
     </div>
@@ -82,7 +82,7 @@ export default {
   flex-direction: column;
   justify-content: center;
 
-  button {
+  .switch-picture {
     background-color: #ee1515;
     color: #ffcb55;
     margin: 8px;
