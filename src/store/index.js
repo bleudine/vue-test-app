@@ -55,8 +55,7 @@ export default new Vuex.Store({
       const { pokemons, types, savedTeams, typeTable } = data
       state.savedTeams = savedTeams
       state.pokemons = pokemons
-      state.types = Array.from(types).sort()
-      state.selectedTypes = Array.from(types)
+      state.types = types
       state.typeTable = typeTable
     }
   },
@@ -70,12 +69,14 @@ export default new Vuex.Store({
             .then(resolve)
             .catch(reject)
         }))).then(results => {
+          resources.types.sort()
           const typeTable = resources.types.map((type) => {
             const currentType = results.find(({ name }) => name === type)
             return resources.types.reduce((acc, t) => {
-              const damageRelations = Object.entries(currentType.damage_relations).filter(([key]) => {
-                return key.includes('from')
-              }).map(([key, value]) => [key, value.map(type => type.name)])
+              const damageRelations = Object.entries(currentType.damage_relations)
+                .filter(([key]) => {
+                  return key.includes('from')
+                }).map(([key, value]) => [key, value.map(type => type.name)])
               const relation = damageRelations.find(([, relations]) => relations.includes(t))
               let multipl = 1
               if (relation) {
@@ -95,7 +96,11 @@ export default new Vuex.Store({
               return { ...acc, [t]: multipl }
             }, { name: type })
           })
-          commit('setResources', { ...resources, typeTable, savedTeams: storedTeams ? JSON.parse(storedTeams) : {} })
+          commit('setResources', {
+            ...resources,
+            typeTable,
+            savedTeams: storedTeams ? JSON.parse(storedTeams) : {}
+          })
         }).catch(console.error)
       })
     },

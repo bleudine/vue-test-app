@@ -31,10 +31,10 @@ export default {
     },
     tags () {
       this.$emit('filter-change', { tags: this.tags, selectedTypes: this.selectedTypes })
+    },
+    types () {
+      this.selectedTypes = Array.from(this.types)
     }
-  },
-  created () {
-    this.selectedTypes = Array.from(this.types)
   },
   methods: {
     addFilter (type) {

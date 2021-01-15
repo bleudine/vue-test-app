@@ -7,6 +7,7 @@
     :expanded.sync="expanded"
     :items-per-page="tableHeaders.length"
     :headers="tableHeaders"
+    loading
     item-key="name"
     :items="typeTable" class="elevation-1">
     <template v-slot:expanded-item="{headers, item }">
@@ -33,8 +34,10 @@ export default {
       expanded: []
     }
   },
-  mounted () {
-
+  watch: {
+    typeTable () {
+      this.loading = false
+    }
   },
   methods: {
     doubleTypeTable (doubledType) {

@@ -26,10 +26,6 @@
 <script>
 import { mapGetters } from 'vuex'
 import ListFilters from '@/components/ListFilters'
-
-// TODO add new routes with pokemon table type (see https://www.pokebip.com/page/jeuxvideo/table-des-types)
-// TODO to achieve this use data table
-
 // TODO use API instead of local resources ffs
 // TODO use translation (french version alongside engrish version) with vue-i18n
 
