@@ -5,6 +5,8 @@
         <router-link to="/pokemon">Home</router-link>
         |
         <router-link to="/team">My team</router-link>
+        |
+        <router-link to="/types">Type Table</router-link>
       </div>
       <list-filters v-on:filter-change="filterPokemons"></list-filters>
       <div class="saved-teams">
