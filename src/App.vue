@@ -79,7 +79,7 @@ export default {
       }
 
       const loweredTags = tags.map(s => s.toLowerCase())
-      this.pokemons = Object.values(this.getPokemons).filter((pokemon) => loweredTags.every(tag => pokemonTypesAndName(pokemon).includes(tag)))
+      this.pokemons = Object.values(this.getPokemons).filter((pokemon) => loweredTags.length ? loweredTags.every(tag => pokemonTypesAndName(pokemon).includes(tag)) : selectedTypes.some(type => pokemonTypesAndName(pokemon).includes(type)))
     }
   }
 }
