@@ -65,6 +65,11 @@ export default {
       title: ''
     }
   },
+  computed: {
+    ...mapGetters({
+      team: 'getTeam'
+    })
+  },
   methods: {
     addToTeam (pokemon) {
       this.$store.dispatch('addToTeam', { pokemon })
@@ -80,11 +85,6 @@ export default {
       this.title = ''
       this.saveTeamDialogBox = false
     }
-  },
-  computed: {
-    ...mapGetters({
-      team: 'getTeam'
-    })
   }
 }
 </script>

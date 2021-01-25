@@ -42,7 +42,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped="">
+<style lang="scss" scoped>
 .pokemon-link {
   display: block;
   text-decoration: none;

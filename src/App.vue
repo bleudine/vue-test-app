@@ -26,6 +26,21 @@
 <script>
 import { mapGetters } from 'vuex'
 import ListFilters from '@/components/ListFilters'
+
+/**
+ * name
+ * components
+ * router guards
+ * props
+ * data
+ * computed
+ * watch
+ * lifecycle hooks
+ * methods
+ * */
+
+// TODO move filter system in Home vue only
+
 // TODO use API instead of local resources ffs
 // TODO use translation (french version alongside engrish version) with vue-i18n
 
@@ -42,6 +57,15 @@ export default {
       pokemons: []
     }
   },
+  computed: {
+    ...mapGetters({
+      savedTeams: 'getSavedTeams',
+      getPokemons: 'getPokemonList'
+    }),
+    savedTeamNames () {
+      return Object.keys(this.savedTeams)
+    }
+  },
   created () {
     this.$store.dispatch('loadResources')
   },
@@ -50,20 +74,12 @@ export default {
       this.$store.dispatch('loadTeam', { name })
     },
     filterPokemons ({ tags, selectedTypes }) {
+      function pokemonTypesAndName ({ types, name }) {
+        return types.reduce((acc, { type }) => `${acc} ${type.name}`, name)
+      }
+
       const loweredTags = tags.map(s => s.toLowerCase())
-      this.pokemons = Object.values(this.getPokemons).filter(({
-        types,
-        name: pokemonName
-      }) => loweredTags.includes(pokemonName) || types.some(({ type: { name } }) => tags.length > 0 ? loweredTags.includes(name) : selectedTypes.includes(name)))
-    }
-  },
-  computed: {
-    ...mapGetters({
-      savedTeams: 'getSavedTeams',
-      getPokemons: 'getPokemonList'
-    }),
-    savedTeamNames () {
-      return Object.keys(this.savedTeams)
+      this.pokemons = Object.values(this.getPokemons).filter((pokemon) => loweredTags.every(tag => pokemonTypesAndName(pokemon).includes(tag)))
     }
   }
 }

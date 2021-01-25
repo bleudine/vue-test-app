@@ -34,6 +34,28 @@ export default {
       expanded: []
     }
   },
+  computed: {
+    ...mapGetters({
+      types: 'getTypes',
+      typeTable: 'getTypeTable'
+    }),
+    tableHeaders () {
+      return [
+        {
+          text: '',
+          align: 'start',
+          sortable: false,
+          value: 'name'
+        },
+        ...this.types.map((type) => ({
+          text: type,
+          align: 'start',
+          sortable: false,
+          value: type
+        }))
+      ]
+    }
+  },
   watch: {
     typeTable () {
       this.loading = false
@@ -56,28 +78,6 @@ export default {
           [key]: value * this.typeTable[typeIndex][key]
         }
       }, {}))
-    }
-  },
-  computed: {
-    ...mapGetters({
-      types: 'getTypes',
-      typeTable: 'getTypeTable'
-    }),
-    tableHeaders () {
-      return [
-        {
-          text: '',
-          align: 'start',
-          sortable: false,
-          value: 'name'
-        },
-        ...this.types.map((type) => ({
-          text: type,
-          align: 'start',
-          sortable: false,
-          value: type
-        }))
-      ]
     }
   }
 }

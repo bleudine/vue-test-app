@@ -30,6 +30,11 @@ export default {
       dialog: false
     }
   },
+  computed: {
+    id () {
+      return this.$route.query.pokemon
+    }
+  },
   watch: {
     dialog (value) {
       if (!value) {
@@ -40,11 +45,6 @@ export default {
   mounted () {
     if (this.id === this.name) {
       this.dialog = true
-    }
-  },
-  computed: {
-    id () {
-      return this.$route.query.pokemon
     }
   },
   methods: {

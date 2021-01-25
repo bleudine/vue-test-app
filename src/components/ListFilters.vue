@@ -25,6 +25,11 @@ export default {
       search: null
     }
   },
+  computed: {
+    ...mapGetters({
+      types: 'getTypes'
+    })
+  },
   watch: {
     selectedTypes () {
       this.$emit('filter-change', { tags: this.tags, selectedTypes: this.selectedTypes })
@@ -47,11 +52,6 @@ export default {
     isSelected (type) {
       return this.selectedTypes.includes(type)
     }
-  },
-  computed: {
-    ...mapGetters({
-      types: 'getTypes'
-    })
   }
 }
 </script>
