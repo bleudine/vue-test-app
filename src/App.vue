@@ -8,7 +8,6 @@
         |
         <router-link to="/types">Type Table</router-link>
       </div>
-      <list-filters v-on:filter-change="filterPokemons"></list-filters>
       <div class="saved-teams">
         <ul>
           <li v-for="name in savedTeamNames" :key="name">
@@ -18,14 +17,13 @@
       </div>
     </div>
     <div class="wrapper">
-      <router-view :pokemons="pokemons"/>
+      <router-view/>
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import ListFilters from '@/components/ListFilters'
 
 /**
  * name
@@ -49,9 +47,6 @@ import ListFilters from '@/components/ListFilters'
 // TODO display pokemon evolutions
 
 export default {
-  components: {
-    ListFilters
-  },
   data () {
     return {
       pokemons: []
@@ -72,14 +67,6 @@ export default {
   methods: {
     loadTeam (name) {
       this.$store.dispatch('loadTeam', { name })
-    },
-    filterPokemons ({ tags, selectedTypes }) {
-      function pokemonTypesAndName ({ types, name }) {
-        return types.reduce((acc, { type }) => `${acc} ${type.name}`, name)
-      }
-
-      const loweredTags = tags.map(s => s.toLowerCase())
-      this.pokemons = Object.values(this.getPokemons).filter((pokemon) => loweredTags.length ? loweredTags.every(tag => pokemonTypesAndName(pokemon).includes(tag)) : selectedTypes.some(type => pokemonTypesAndName(pokemon).includes(type)))
     }
   }
 }
@@ -114,34 +101,6 @@ body {
       &.router-link-exact-active {
         color: #f0f0f0;
         text-decoration: none;
-      }
-    }
-  }
-
-  .type-filter-list {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    max-width: 18em;
-    margin: 32px 0;
-
-    .type-filter {
-      margin: 2px;
-      width: 48px;
-      padding: 1px;
-      cursor: pointer;
-
-      img {
-        display: block;
-        width: 100%;
-        margin: auto;
-        filter: opacity(.5);
-      }
-
-      &.--selected {
-        img {
-          filter: none;
-        }
       }
     }
   }

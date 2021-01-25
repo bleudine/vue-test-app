@@ -1,31 +1,34 @@
 <template>
   <div class="home">
-    <div class="team" v-if="team.length > 0">
-      <div class="pokemon-team" v-for="(pokemon, index) in team" :key="`team-${index}`">
-        <pokemon-lightbox :name="pokemon.name" @close-lightbox="closeLightbox">
-          <template v-slot:activator>
-            <pokemon :pokemon="pokemon" :sprite="pokemon.sprites['front_default']">
-              <template v-slot:header>
-                <v-btn class="remove-button" @click.stop="removeFromTeam(index)">x</v-btn>
-              </template>
-            </pokemon>
+    <header class="home-header">
+      <div class="team" v-if="team.length > 0">
+        <div class="pokemon-team" v-for="(pokemon, index) in team" :key="`team-${index}`">
+          <pokemon-lightbox :name="pokemon.name" @close-lightbox="closeLightbox">
+            <template v-slot:activator>
+              <pokemon :pokemon="pokemon" :sprite="pokemon.sprites['front_default']">
+                <template v-slot:header>
+                  <v-btn class="remove-button" @click.stop="removeFromTeam(index)">x</v-btn>
+                </template>
+              </pokemon>
+            </template>
+          </pokemon-lightbox>
+        </div>
+        <v-dialog width="250" v-model="saveTeamDialogBox">
+          <template v-slot:activator="{on, attrs}">
+            <v-btn v-on="on" v-bind="attrs">
+              <v-icon>mdi-content-save</v-icon>
+            </v-btn>
           </template>
-        </pokemon-lightbox>
+          <v-card>
+            <div class="save-team-dialog">
+              <v-text-field v-model="title" :append-outer-icon="'mdi-send'" label="Team name"
+                            @click:append-outer="saveTeam"></v-text-field>
+            </div>
+          </v-card>
+        </v-dialog>
       </div>
-      <v-dialog width="250" v-model="saveTeamDialogBox">
-        <template v-slot:activator="{on, attrs}">
-          <v-btn v-on="on" v-bind="attrs">
-            <v-icon>mdi-content-save</v-icon>
-          </v-btn>
-        </template>
-        <v-card>
-          <div class="save-team-dialog">
-            <v-text-field v-model="title" :append-outer-icon="'mdi-send'" label="Team name"
-                          @click:append-outer="saveTeam"></v-text-field>
-          </div>
-        </v-card>
-      </v-dialog>
-    </div>
+      <list-filters v-on:filter-change="filterPokemons"></list-filters>
+    </header>
     <div class="pokemon-list">
       <div class="pokemon-container" v-for="poke in pokemons" :key="poke.id">
         <pokemon-lightbox :name="poke.name" @close-lightbox="closeLightbox">
@@ -46,28 +49,29 @@
 </template>
 
 <script>
-import Pokemon from '../components/Pokemon.vue'
+import Pokemon from '@/components/Pokemon.vue'
 import PokemonLightbox from '@/components/PokemonModal'
+import ListFilters from '@/components/ListFilters'
 import { mapGetters } from 'vuex'
 
 export default {
   name: 'Home',
   components: {
     Pokemon,
-    PokemonLightbox
-  },
-  props: {
-    pokemons: Array
+    PokemonLightbox,
+    ListFilters
   },
   data () {
     return {
       saveTeamDialogBox: false,
-      title: ''
+      title: '',
+      pokemons: []
     }
   },
   computed: {
     ...mapGetters({
-      team: 'getTeam'
+      team: 'getTeam',
+      getPokemons: 'getPokemonList'
     })
   },
   methods: {
@@ -84,12 +88,27 @@ export default {
       this.$store.dispatch('saveTeam', { title: this.title })
       this.title = ''
       this.saveTeamDialogBox = false
+    },
+    filterPokemons ({ tags, selectedTypes }) {
+      function pokemonTypesAndName ({ types, name }) {
+        return types.reduce((acc, { type }) => `${acc} ${type.name}`, name)
+      }
+
+      const loweredTags = tags.map(s => s.toLowerCase())
+      this.pokemons = Object.values(this.getPokemons).filter((pokemon) => loweredTags.length ? loweredTags.every(tag => pokemonTypesAndName(pokemon).includes(tag)) : selectedTypes.some(type => pokemonTypesAndName(pokemon).includes(type)))
     }
   }
 }
 </script>
 
 <style lang="scss">
+.home-header {
+  position: sticky;
+  top: 0;
+  z-index: 11;
+  box-shadow: 0 2px 2px 0 rgba(44, 62, 80, .2);
+}
+
 .team {
   display: flex;
   flex-direction: row;
@@ -97,12 +116,7 @@ export default {
   align-items: center;
   width: 100%;
   max-width: 100%;
-  position: sticky;
-  top: 0;
   background-color: #ee1515;
-  box-shadow: 0 2px 2px 0 rgba(44, 62, 80, .2);
-  z-index: 11;
-  padding: 8px;
 
   .pokemon-team {
     margin: 12px;
