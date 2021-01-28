@@ -37,14 +37,13 @@ import { mapGetters } from 'vuex'
  * methods
  * */
 
-// TODO move filter system in Home vue only
+// TODO add colours to type table
+// single view :
+// TODO display weakness table
+// TODO display pokemon evolutions
 
 // TODO use API instead of local resources ffs
 // TODO use translation (french version alongside engrish version) with vue-i18n
-
-// single view pokemon
-// TODO display weakness table
-// TODO display pokemon evolutions
 
 export default {
   data () {

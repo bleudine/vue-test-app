@@ -1,32 +1,53 @@
 <template>
   <v-data-table
-    show-expand
     hide-default-footer
     dense
     :single-expand="singleExpand"
     :expanded.sync="expanded"
     :items-per-page="tableHeaders.length"
     :headers="tableHeaders"
-    loading
+    hide-default-header
     item-key="name"
-    :items="typeTable" class="elevation-1">
+    :items="typeTable">
+    <template v-slot:header="{props: {headers}}">
+      <type-table-row-header :headers="headers"/>
+    </template>
+    <template v-slot:item="{item, expand}">
+      <type-table-row @expand-row="expand" :item="item"/>
+    </template>
     <template v-slot:expanded-item="{headers, item }">
-      <td class="nested-table" :colspan="headers.length + 1">
-        <v-data-table
-          dense
-          :items-per-page="tableHeaders.length"
-          hide-default-footer :headers="tableHeaders"
-          :items="doubleTypeTable(item.name)"></v-data-table>
-      </td>
+      <tr>
+        <td class="nested-table" :colspan="headers.length">
+          <v-data-table
+            dense
+            :items-per-page="tableHeaders.length"
+            hide-default-header
+            hide-default-footer :headers="tableHeaders"
+            :items="doubleTypeTable(item.name)">
+            <template v-slot:header="{props: {headers}}">
+              <type-table-row-header :headers="headers"/>
+            </template>
+            <template v-slot:item="{ item }">
+              <type-table-row :item="item"/>
+            </template>
+          </v-data-table>
+        </td>
+      </tr>
     </template>
   </v-data-table>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import TypeTableRow from '@/components/TypeTableRow'
+import TypeTableRowHeader from '@/components/TypeTableRowHeader'
 
 export default {
   name: 'Types',
+  components: {
+    TypeTableRow,
+    TypeTableRowHeader
+  },
   data () {
     return {
       loading: true,
@@ -89,4 +110,7 @@ export default {
   padding: 0 !important;
 }
 
+table, td, th {
+  text-align: center !important;
+}
 </style>
