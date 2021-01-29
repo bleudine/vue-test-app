@@ -72,10 +72,7 @@ export default {
       saveTeamDialogBox: false,
       title: '',
       selectedTags: [],
-      selectedTypes: [],
-      showModal: false,
-      selectedPokemon: null,
-      loading: true
+      selectedTypes: []
     }
   },
   computed: {

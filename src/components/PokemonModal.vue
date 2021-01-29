@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" width="600" @click:outside="closeLightbox">
     <v-card>
-      <div class="modal-content">
+      <div v-if="dialog" class="modal-content">
         <pokemon-details :id="id"/>
       </div>
     </v-card>
