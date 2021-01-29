@@ -46,15 +46,9 @@ import { mapGetters } from 'vuex'
 // TODO use translation (french version alongside engrish version) with vue-i18n
 
 export default {
-  data () {
-    return {
-      pokemons: []
-    }
-  },
   computed: {
     ...mapGetters({
-      savedTeams: 'getSavedTeams',
-      getPokemons: 'getPokemonList'
+      savedTeams: 'getSavedTeams'
     }),
     savedTeamNames () {
       return Object.keys(this.savedTeams)

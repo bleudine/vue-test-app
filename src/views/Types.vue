@@ -48,6 +48,11 @@ export default {
     TypeTableRow,
     TypeTableRowHeader
   },
+  beforeRouteEnter (to, from, next) {
+    next(async vm => {
+      await vm.$store.dispatch('loadTypeTable')
+    })
+  },
   data () {
     return {
       loading: true,

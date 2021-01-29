@@ -3,15 +3,11 @@
     <header class="home-header">
       <div class="team" v-if="team.length > 0">
         <div class="pokemon-team" v-for="(pokemon, index) in team" :key="`team-${index}`">
-          <pokemon-lightbox :name="pokemon.name" @close-lightbox="closeLightbox">
-            <template v-slot:activator>
-              <pokemon :pokemon="pokemon" :sprite="pokemon.sprites['front_default']">
-                <template v-slot:header>
-                  <v-btn class="remove-button" @click.stop="removeFromTeam(index)">x</v-btn>
-                </template>
-              </pokemon>
+          <pokemon :pokemon="pokemon" :sprite="pokemon.sprites['front_default']">
+            <template v-slot:header>
+              <v-btn class="remove-button" @click.stop="removeFromTeam(index)">x</v-btn>
             </template>
-          </pokemon-lightbox>
+          </pokemon>
         </div>
         <v-dialog width="250" v-model="saveTeamDialogBox">
           <template v-slot:activator="{on, attrs}">
@@ -21,30 +17,35 @@
           </template>
           <v-card>
             <div class="save-team-dialog">
-              <v-text-field v-model="title" :append-outer-icon="'mdi-send'" label="Team name"
-                            @click:append-outer="saveTeam"></v-text-field>
+              <v-text-field
+                v-model="title"
+                :append-outer-icon="'mdi-send'"
+                label="Team name"
+                @click:append-outer="saveTeam"/>
             </div>
           </v-card>
         </v-dialog>
       </div>
-      <list-filters v-on:filter-change="filterPokemons"></list-filters>
+      <list-filters
+        @tag-change="updateTags"
+        @added-type="selectType"
+        @removed-type="unselectType"
+        :selected-tags="selectedTags"
+        :selected-types="selectedTypes"/>
     </header>
     <div class="pokemon-list">
       <div class="pokemon-container" v-for="poke in pokemons" :key="poke.id">
-        <pokemon-lightbox :name="poke.name" @close-lightbox="closeLightbox">
-          <template v-slot:activator>
-            <pokemon :pokemon="poke" :sprite="poke.sprites['front_default']">
-              <template v-slot:header>
-                <span class="pokemon-name">{{ poke.name }}</span>
-              </template>
-              <template v-slot:footer>
-                <v-btn @click.stop="addToTeam(poke)">Add to team</v-btn>
-              </template>
-            </pokemon>
+        <pokemon :pokemon="poke" :sprite="poke.sprites['front_default']">
+          <template v-slot:header>
+            <span class="pokemon-name">{{ poke.name }}</span>
           </template>
-        </pokemon-lightbox>
+          <template v-slot:footer>
+            <v-btn small @click.stop="addToTeam(poke)">Add to team</v-btn>
+          </template>
+        </pokemon>
       </div>
     </div>
+    <pokemon-lightbox @close-lightbox="closeLightbox"/>
   </div>
 </template>
 
@@ -61,20 +62,46 @@ export default {
     PokemonLightbox,
     ListFilters
   },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      vm.selectedTypes = [...vm.types]
+    })
+  },
   data () {
     return {
       saveTeamDialogBox: false,
       title: '',
-      pokemons: []
+      selectedTags: [],
+      selectedTypes: [],
+      showModal: false,
+      selectedPokemon: null,
+      loading: true
     }
   },
   computed: {
     ...mapGetters({
       team: 'getTeam',
-      getPokemons: 'getPokemonList'
-    })
+      getPokemons: 'getPokemonListSmall',
+      types: 'getTypes'
+    }),
+    pokemons () {
+      const loweredTags = this.selectedTags.map(s => s.toLowerCase())
+      return this.getPokemons
+        .filter((pokemon) =>
+          loweredTags.length
+            ? loweredTags
+              .every(tag => this.pokemonTypesAndName(pokemon)
+                .includes(tag))
+            : this.selectedTypes
+              .some(type => this.pokemonTypesAndName(pokemon)
+                .includes(type))
+        )
+    }
   },
   methods: {
+    pokemonTypesAndName ({ types, name }) {
+      return types.reduce((acc, { type }) => `${acc} ${type.name}`, name)
+    },
     addToTeam (pokemon) {
       this.$store.dispatch('addToTeam', { pokemon })
     },
@@ -89,13 +116,14 @@ export default {
       this.title = ''
       this.saveTeamDialogBox = false
     },
-    filterPokemons ({ tags, selectedTypes }) {
-      function pokemonTypesAndName ({ types, name }) {
-        return types.reduce((acc, { type }) => `${acc} ${type.name}`, name)
-      }
-
-      const loweredTags = tags.map(s => s.toLowerCase())
-      this.pokemons = Object.values(this.getPokemons).filter((pokemon) => loweredTags.length ? loweredTags.every(tag => pokemonTypesAndName(pokemon).includes(tag)) : selectedTypes.some(type => pokemonTypesAndName(pokemon).includes(type)))
+    updateTags (tags) {
+      this.selectedTags = tags
+    },
+    unselectType (type) {
+      this.selectedTypes.splice(this.selectedTypes.indexOf(type), 1)
+    },
+    selectType (type) {
+      this.selectedTypes.push(type)
     }
   }
 }

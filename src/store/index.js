@@ -22,6 +22,16 @@ export default new Vuex.Store({
     getPokemonList: (state) => {
       return Object.values(state.pokemons)
     },
+    getPokemonListSmall: (state) => {
+      return Object.values(state.pokemons).reduce((acc, { types, name, sprites }) => {
+        acc.push({
+          types,
+          name,
+          sprites
+        })
+        return acc
+      }, [])
+    },
     getTypes: (state) => {
       return state.types
     },
@@ -52,56 +62,67 @@ export default new Vuex.Store({
       state.team = team
     },
     setResources (state, data) {
-      const { pokemons, types, savedTeams, typeTable } = data
+      const { pokemons, types, savedTeams } = data
       state.savedTeams = savedTeams
       state.pokemons = pokemons
       state.types = types
+    },
+    setTypeTable (state, data) {
+      const { typeTable } = data
       state.typeTable = typeTable
     }
   },
   actions: {
+    loadTypeTable ({ commit }) {
+      // eslint-disable-next-line promise/param-names
+      return new Promise((res) => {
+        fetch('https://pokeapi.co/api/v2/type').then(resp => resp.json()).then(({ results }) => {
+          Promise.all(results.map(({ url }) => new Promise((resolve, reject) => {
+            fetch(url)
+              .then(response => response.json())
+              .then(resolve)
+              .catch(reject)
+          }))).then(results => {
+            resources.types.sort()
+            const typeTable = resources.types.map((type) => {
+              const currentType = results.find(({ name }) => name === type)
+              return resources.types.reduce((acc, t) => {
+                const damageRelations = Object.entries(currentType.damage_relations)
+                  .filter(([key]) => {
+                    return key.includes('from')
+                  }).map(([key, value]) => [key, value.map(type => type.name)])
+                const relation = damageRelations.find(([, relations]) => relations.includes(t))
+                let multipl = 1
+                if (relation) {
+                  const [modifier] = relation
+                  switch (modifier) {
+                    case 'no_damage_from':
+                      multipl = 0
+                      break
+                    case 'half_damage_from':
+                      multipl = 0.5
+                      break
+                    case 'double_damage_from':
+                      multipl = 2
+                      break
+                  }
+                }
+                return { ...acc, [t]: multipl }
+              }, { name: type })
+            })
+            commit('setTypeTable', {
+              typeTable
+            })
+            res()
+          }).catch(console.error)
+        })
+      })
+    },
     loadResources ({ commit }) {
       const storedTeams = localStorage.getItem('savedTeams')
-      fetch('https://pokeapi.co/api/v2/type').then(resp => resp.json()).then(({ results }) => {
-        Promise.all(results.map(({ url }) => new Promise((resolve, reject) => {
-          fetch(url)
-            .then(response => response.json())
-            .then(resolve)
-            .catch(reject)
-        }))).then(results => {
-          resources.types.sort()
-          const typeTable = resources.types.map((type) => {
-            const currentType = results.find(({ name }) => name === type)
-            return resources.types.reduce((acc, t) => {
-              const damageRelations = Object.entries(currentType.damage_relations)
-                .filter(([key]) => {
-                  return key.includes('from')
-                }).map(([key, value]) => [key, value.map(type => type.name)])
-              const relation = damageRelations.find(([, relations]) => relations.includes(t))
-              let multipl = 1
-              if (relation) {
-                const [modifier] = relation
-                switch (modifier) {
-                  case 'no_damage_from':
-                    multipl = 0
-                    break
-                  case 'half_damage_from':
-                    multipl = 0.5
-                    break
-                  case 'double_damage_from':
-                    multipl = 2
-                    break
-                }
-              }
-              return { ...acc, [t]: multipl }
-            }, { name: type })
-          })
-          commit('setResources', {
-            ...resources,
-            typeTable,
-            savedTeams: storedTeams ? JSON.parse(storedTeams) : {}
-          })
-        }).catch(console.error)
+      commit('setResources', {
+        ...resources,
+        savedTeams: storedTeams ? JSON.parse(storedTeams) : {}
       })
     },
     addToTeam ({ commit }, { pokemon }) {

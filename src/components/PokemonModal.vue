@@ -1,10 +1,5 @@
 <template>
   <v-dialog v-model="dialog" width="600" @click:outside="closeLightbox">
-    <template v-slot:activator="{on, attrs}">
-      <div v-on="on" v-bind="attrs">
-        <slot name="activator"></slot>
-      </div>
-    </template>
     <v-card>
       <div class="modal-content">
         <pokemon-details :id="id"/>
@@ -21,13 +16,10 @@ export default {
   components: {
     PokemonDetails
   },
-  props: {
-    name: String
-  },
   data () {
     return {
       left: 0,
-      dialog: false
+      dialog: Boolean(this.$route.query.pokemon)
     }
   },
   computed: {
@@ -36,15 +28,8 @@ export default {
     }
   },
   watch: {
-    dialog (value) {
-      if (!value) {
-        this.closeLightbox()
-      }
-    }
-  },
-  mounted () {
-    if (this.id === this.name) {
-      this.dialog = true
+    id (value) {
+      this.dialog = Boolean(value)
     }
   },
   methods: {
